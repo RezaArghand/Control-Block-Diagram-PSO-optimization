@@ -1,0 +1,80 @@
+# Driver code for Sphere function
+print("\nBegin particle swarm optimization on sphere function\n")
+dim = 3
+fitness = fitness_sphere
+ 
+ 
+print("Goal is to minimize sphere function in " + str(dim) + " variables")
+print("Function has known min = 0.0 at (", end="")
+for i in range(dim-1):
+  print("0, ", end="")
+print("0)")
+ 
+num_particles = 50
+max_iter = 100
+ 
+print("Setting num_particles = " + str(num_particles))
+print("Setting max_iter    = " + str(max_iter))
+print("\nStarting PSO algorithm\n")
+ 
+ 
+ 
+best_position = pso(fitness, max_iter, num_particles, dim, -10.0, 10.0)
+ 
+print("\nPSO completed\n")
+print("\nBest solution found:")
+print(["%.6f"%best_position[k] for k in range(dim)])
+fitnessVal = fitness(best_position)
+print("fitness of best solution = %.6f" % fitnessVal)
+ 
+print("\nEnd particle swarm for sphere function\n")
+
+
+
+
+
+from sympy import *
+import control as co
+import numpy as np
+# from sympy.abc import s
+import matplotlib.pyplot as plt
+from scipy import signal
+from sympy.integrals import inverse_laplace_transform
+
+# constants
+k = 1
+tt = 0.5
+a = 2
+b = 1
+
+# end_constants
+
+s = symbols('s')
+t = symbols('t', positive=True)
+
+# s = co.TransferFunction.s
+
+# plant presentation
+Plant = (k * exp(-tt * s)) / (s ** 2 + a * s + b)
+
+
+def costFunction(xx):
+    # defining the pid functions
+    pid1 = xx[0] / s + xx[1] * s + xx[2]
+    pid2 = xx[3] / s + xx[4] * s + xx[5]
+    pid3 = xx[6] / s + xx[7] * s + xx[8]
+
+    # defining the system transfer function
+    sys1 = (Plant / (1 - Plant * pid3))
+    sys2 = pid1 * sys1
+    transferFunction = sys2 / (1 - (pid2 * sys2))
+    stepInputTransferFunc = transferFunction / s
+    # time response of transfer function
+    timeResp = inverse_laplace_transform(stepInputTransferFunc, s, t)
+    cost = float(sympy.integrate(timeResp, (t, 0, 14)))
+    return cost
+
+
+sample = np.arange(9)
+
+print(costFunction(sample))
