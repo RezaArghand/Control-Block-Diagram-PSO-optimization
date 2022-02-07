@@ -7,6 +7,8 @@ import copy  # array-copying convenience
 import sys
 from time import time  # max float
 import CostFunction as rs
+import Parameters as Par
+import smallFunctions as sf
 
 start_time = time()
 
@@ -151,8 +153,8 @@ def pso(fitness, max_iter, n, dim, minx, maxx, w, c1, c2, satisfaction_fitness):
         # for-each particle
         Iter += 1
         w = w * wDamp
-        # if best_swarm_fitnessVal < satisfaction_fitness:
-        #   break
+        if best_swarm_fitnessVal < satisfaction_fitness:
+            break
     # end_while
     return best_swarm_pos
 
@@ -163,17 +165,17 @@ def pso(fitness, max_iter, n, dim, minx, maxx, w, c1, c2, satisfaction_fitness):
 # ----------------------------
 # Driver code for rastrigin function
 
-dim = 3  # variables count
+dim = sf.varNum()  # variables count
 fitness = fitness_Rasa  # fitness function name
-wDamp = 0.9  # inertia damper
-xmax = 100  # max domain
-xmin = 1  # min domain
-satisfaction_fitness = 1.0e-200  # satisfaction point
-w = 0.95  # inertia
-c1 = 1.4962  # cognitive (particle)
-c2 = 2.4962  # social (swarm)
-num_particles = 250  # particle count
-max_iter = 1000  # max iteration
+wDamp = Par.damping_rate_W  # inertia damper
+xmax = Par.max_of_variable  # max domain
+xmin = Par.min_of_variable  # min domain
+satisfaction_fitness = Par.satisfaction_cost_number  # satisfaction point
+w = Par.W  # inertia
+c1 = Par.C1  # cognitive (particle)
+c2 = Par.C2  # social (swarm)
+num_particles = Par.number_of_particles  # particle count
+max_iter = Par.max_iteration_number  # max iteration
 
 print("Setting num_particles = " + str(num_particles))
 print("Setting max_iter    = " + str(max_iter))

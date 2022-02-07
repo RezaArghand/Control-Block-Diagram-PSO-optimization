@@ -1,5 +1,5 @@
 import math
-
+import Parameters as Par
 import numpy as np
 import control.matlab as control
 import matplotlib.pyplot as plt
@@ -25,36 +25,52 @@ def costFunction(position):
     s = control.tf('s')
 
     U = 1 / s
-    pid1 = position[0] / s + position[1] * s + position[2]
-    # pid2 = position[3] / s + position[4] * s + position[5]
-    # pid3 = position[6] / s + position[7] * s + position[8]
 
-    Plant = 1 / (s ** 2 + 10 * s + 20)
+    if Par.pid1 == 2:
+        pid1 = position[0] / s + position[1] * s + position[2]
+    elif Par.pid1 == 0:
+        pid1 = 0
+    elif Par.pid1 == 1:
+        pid1 = 1
+    else:
+        print("Choose a proper pid1 number in Parameters: 0 or 1 or 2")
+
+    if Par.pid2 == 2:
+        pid2 = position[3] / s + position[4] * s + position[5]
+    elif Par.pid2 == 0:
+        pid2 = 0
+    elif Par.pid2 == 1:
+        pid2 = 1
+    else:
+        print("Choose a proper pid2 number in Parameters: 0 or 1 or 2")
+
+    if Par.pid3 == 2:
+        pid3 = position[6] / s + position[7] * s + position[8]
+    elif Par.pid3 == 0:
+        pid2 = 0
+    elif Par.pid3 == 1:
+        pid3 = 1
+    else:
+        print("Choose a proper pid3 number in Parameters: 0 or 1 or 2")
+
+    Plant = Par.Plant
     # defining the system transfer function
+    sys1 = Plant / (1 - Plant * pid3)
+    sys2 = sys1 * pid1
 
-    fullSys = Plant * pid1 / (1 + Plant * pid1)
-    controlEffort = pid1 / (1 + Plant * pid1)
-    y, t = control.step(fullSys, T=14)
-    sumCostEffort = 0
+    fullSys = sys2 / (1 - sys2 * pid2)
 
-    u, t1 = control.step(Plant, T=14)
-    costFE = abs(u)
-    sumCostEffort = scipy.integrate.simps(costFE, x=None, dx=14 / len(u))
-    costF = abs(1 - y)
+    yStep, tStep = control.step(fullSys, T=14)
 
-    sumAll = 0
-    sumCost = 0
+    costF = abs(1 - yStep)
 
-    sumCost = scipy.integrate.simps(costF, x=None, dx=14 / len(y))
+    sumCost = scipy.integrate.simps(costF, x=None, dx=14 / len(yStep))
 
-    sumAll = sumCost + sumCostEffort
-    plt.plot(t1, u)
-    plt.plot(t, y)
-    plt.grid()
-    plt.show()
-    return rev
+    # plt.plot(t, y)
+    # plt.grid()
+    # plt.show()
+    return sumCost
 
-
-xx = np.array((0, 1, 0.12))
-ff = costFunction(xx)
-print(xx)
+# xx = np.array((0, 1, 0.12))
+# ff = costFunction(xx)
+# print(xx)
