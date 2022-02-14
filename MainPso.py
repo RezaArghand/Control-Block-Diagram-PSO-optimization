@@ -1,11 +1,14 @@
 # python implementation of particle swarm optimization (PSO)
 # minimizing rastrigin and sphere function
 
-import random
-import math  # cos() for Rastrigin
 import copy  # array-copying convenience
+import math  # cos() for Rastrigin
+import random
 import sys
 from time import time  # max float
+
+import matplotlib.pyplot as plt
+
 import CostFunction as rs
 import Parameters as Par
 import smallFunctions as sf
@@ -79,6 +82,9 @@ class Particle:
 
 # particle swarm optimization function
 
+iterPlot = []
+fitnessPlot = []
+
 
 def pso(fitness, max_iter, n, dim, minx, maxx, w, c1, c2, satisfaction_fitness):
     rnd = random.Random(0)
@@ -149,7 +155,8 @@ def pso(fitness, max_iter, n, dim, minx, maxx, w, c1, c2, satisfaction_fitness):
             if swarm[i].fitness < best_swarm_fitnessVal:
                 best_swarm_fitnessVal = swarm[i].fitness
                 best_swarm_pos = copy.copy(swarm[i].position)
-
+        iterPlot.append(Iter)
+        fitnessPlot.append(best_swarm_fitnessVal)
         # for-each particle
         Iter += 1
         w = w * wDamp
@@ -195,3 +202,13 @@ full_time = end_time - start_time
 print("The time consumed = " + str(full_time // 60) + " minutes " + str(full_time % 60) + " seconds ")
 print()
 print()
+
+fig = plt.figure(1)  # identifies the figure
+plt.title("cost function", fontsize='16')  # title
+plt.plot(iterPlot, fitnessPlot)  # plot the points
+plt.xlabel("iteration", fontsize='13')  # adds a label in the x axis
+plt.ylabel("cost function", fontsize='13')  # adds a label in the y axis
+# plt.legend(('YvsX'), loc='best')  # creates a legend to identify the plot
+# plt.savefig('Y_X.png')  # saves the figure in the present directory
+plt.grid()  # shows a grid under the plot
+plt.show()
